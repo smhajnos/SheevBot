@@ -155,6 +155,7 @@ async def redditcheck():
                     ch = bot.get_channel(channels["modposts"])
                     await ch.send("New Modpost by /u/{}:\r\n\r\nhttps://www.reddit.com{}".format(submission.author.name, submission.permalink))
                     cursor.execute("INSERT INTO modposts (post) VALUES (?)",(submission.id,))
+                    commit()
             else:
                 print("No sticky #{} found".format(i))
                                                                               
