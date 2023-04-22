@@ -88,11 +88,8 @@ test_subreddit = reddit.subreddit("PrequelMemesTest")
  # | |    / _ \| '_ ` _ \| '_ ` _ \ / _` | '_ \ / _` / __|
  # | |___| (_) | | | | | | | | | | | (_| | | | | (_| \__ \
  #  \_____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|___/
-@bot.slash_command(name="postcheck",description="Manually check posts for compliance to our bot-prevention measures",guild_ids=servers)
-async def postcheck(ctx):
-    await ctx.send("Starting...")                          
-    rv = await post_checker()
-    await ctx.send(rv)
+
+# no commands right now. More to come!
 
  #  _______          _                 _____                           _                 
  # |__   __|        | |       ___     / ____|                         | |                
