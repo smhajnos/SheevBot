@@ -7,6 +7,9 @@ Created on Fri Apr 21 17:26:17 2023
 
 import praw
 import sheevsecrets
+import datetime
+import json
+import sqlite3
 
 def login():
     username = "SheevBot"
@@ -26,6 +29,7 @@ def test1():
     oc_thanks = "OP Confirmed they made this!"
     repost_shame = "Fuck you OP you didn't supply a source"
     oc_shame = "Fuck you OP you didn't make this"
+    time_to_reply = 60 # time in seconds to reply
     reddit = login()
     test_subreddit = reddit.subreddit("PrequelMemesTest")
     new_posts = test_subreddit.new()
@@ -58,15 +62,17 @@ def test1():
                         if op_provided_source and is_repost:
                             comment.edit(body=repost_thanks)
                         elif is_repost:
-                            # TODO: check age
-                            comment.edit(body=repost_shame)
-                            # TODO: remove post
+                            time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - comment.created_utc
+                            if time_delta > time_to_reply:
+                                comment.edit(body=repost_shame)
+                                # TODO: remove post
                         elif op_provided_source and is_oc:
                             comment.edit(body=oc_thanks)
                         elif is_oc:
-                            # TODO: check age
-                            comment.edit(body=oc_shame)
-                            # TODO: remove psot
+                            time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - comment.created_utc
+                            if time_delta > time_to_reply:
+                                comment.edit(body=oc_shame)
+                                # TODO: remove psot
                     break # no need to keep looking for stickied comments
                             
         if submission.approved_by:
@@ -77,3 +83,55 @@ def test1():
         if not already_modded and is_oc:
             comment = submission.reply(body=oc_text)
             comment.mod.distinguish(sticky=True)
+
+
+def configtest():
+    reddit = login()
+    cfg_str = reddit.subreddit("PrequelMemes").wiki["sheevbot"].content_md
+    print(cfg_str)
+    
+def getconfig(param):
+    reddit = login()
+    cfg_str = reddit.subreddit("PrequelMemes").wiki["sheevbot"].content_md
+    cfg = json.loads(cfg_str)
+    return cfg[param]
+
+def setconfig(param,value):
+    reddit = login()
+    cfg_str = reddit.subreddit("PrequelMemes").wiki["sheevbot"].content_md
+    cfg = json.loads(cfg_str)
+    cfg[param] = value
+    cfg_str = json.dumps(cfg, sort_keys=True, indent=4)
+    reddit.subreddit("PrequelMemes").wiki["sheevbot"].edit(content=cfg_str,reason="test edit")
+    
+    
+def configparamsetup():
+    dataWarehouse = sqlite3.connect("datawarehouse.db")
+    cursor = dataWarehouse.cursor()
+    reddit = login()
+    cfg_str = reddit.subreddit("PrequelMemes").wiki["sheevbot"].content_md
+    cfg = json.loads(cfg_str)
+    for param in cfg:
+        cursor.execute("SELECT COUNT(*) FROM configparams WHERE param_name = ?",(param,))
+        res = cursor.fetchone()
+        if res[0] == 0:
+                print("Inserting param {}".format(param))
+                cursor.execute("INSERT INTO configparams (param_name) VALUES (?)",(str(param),))
+    dataWarehouse.commit()
+    
+def validateconfig():
+    dataWarehouse = sqlite3.connect("datawarehouse.db")
+    cursor = dataWarehouse.cursor()
+    reddit = login()
+    cfg_str = reddit.subreddit("PrequelMemes").wiki["sheevbot"].content_md
+    cfg = json.loads(cfg_str)
+    cursor.execute("SELECT * FROM configparams")
+    res = cursor.fetchall()
+    retval = True
+    for r in res:
+        if r[0] in cfg:
+            print("Found parameter {}".format(r))
+        else:
+            print("Didn't find parameter {}".format(r))
+            retval = False
+    return retval
