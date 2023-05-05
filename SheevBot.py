@@ -62,8 +62,8 @@ reddit = praw.Reddit(client_id=sheevsecrets.REDDIT_CLIENT_ID,
                      password=sheevsecrets.REDDIT_PASSWORD,
                      user_agent='SheevBot, the /r/PrequelMemes mod bot',
                      username=username)  
-#subreddit_names = ["PrequelMemes", "PrequelMemesTest"]
-subreddit_names = ["PrequelMemesTest"]
+subreddit_names = ["PrequelMemes", "PrequelMemesTest"]
+#subreddit_names = ["PrequelMemesTest"]
 subreddits = []
 for s in subreddit_names:
     subreddits.append(reddit.subreddit(s))
@@ -179,12 +179,12 @@ def setconfig(param, val):
 async def redditcheck():                                                                            
     for subreddit in subreddits:
         for i in [1,2]:
-            print("getting sticky #{}".format(i))
             try:
                 submission = subreddit.sticky(number=i)
             except:
                 submission = None
             if submission:
+                print("Found sticky #{} in {}".format(i,subreddit.display_name))
                 cursor.execute("SELECT COUNT(*) FROM modposts WHERE post = ?",(submission.id,))
                 res = cursor.fetchone()
                 if res[0] == 0 and submission.title != "Free Talk Friday":
@@ -193,7 +193,7 @@ async def redditcheck():
                     cursor.execute("INSERT INTO modposts (post) VALUES (?)",(submission.id,))
                     commit()
             else:
-                print("No sticky #{} found".format(i))
+                print("No sticky #{} found in {}".format(i,subreddit.display_name))
                                                                               
                                                                                        
 @tasks.loop(seconds=180)
@@ -241,7 +241,7 @@ async def post_checker():
     #check_subreddits = subreddits
     check_subreddits = [test_subreddit]
     for sub_to_check in check_subreddits:
-        new_posts = sub_to_check.new()
+        new_posts = sub_to_check.new(limit=100)
         for submission in new_posts:
             post_count += 1
             await asyncio.sleep(1) # prevents blocking
@@ -254,7 +254,7 @@ async def post_checker():
                     is_repost = True
                 elif "OC" in submission.link_flair_text.upper():
                     is_oc = True
-                for comment in submission.comments.list():
+                for comment in submission.comments:
                     if comment.stickied and not comment.author.name == "SheevBot":
                         already_modded = True # modded by someone else, let the humans handle it
                         break # no need to keep looking for stickied comments
@@ -265,11 +265,11 @@ async def post_checker():
                             c_replies.replace_more()
                             for c_reply in c_replies: # look for a comment reply by OP
                                 if c_reply.author.name == submission.author.name:
-                                        if is_repost and "http" in c_reply.body:
-                                            op_provided_source = True
-                                            # do NOT break the loop, in case OP posted multiple comments and only one is the one with the link
-                                        elif is_oc:
-                                            op_provided_source = True
+                                    if is_repost and "http" in c_reply.body:
+                                        op_provided_source = True
+                                        # do NOT break the loop, in case OP posted multiple comments and only one is the one with the link
+                                    elif is_oc:
+                                        op_provided_source = True
                             if op_provided_source and is_repost:
                                 comment.edit(body=repost_thanks)
                             elif is_repost:
