@@ -260,7 +260,13 @@ async def post_checker():
                         break # no need to keep looking for stickied comments
                     elif comment.stickied: # mod commment by the bot
                         already_modded = True # modded by the bot, no need for another comment
-                        if comment.body in [repost_text, oc_text]: # the post was flaired as a repost at the time of the comment
+                        if comment.body in [repost_text, oc_text]: # the post was flaired as a repost or OC at the time of the comment
+                            
+                            if (comment.body == repost_text) and is_oc:
+                                comment.edit(body=oc_text)
+                            elif (comment.body == oc_text) and is_repost:
+                                commment.edit(body=repost_text)
+                            
                             c_replies = comment.replies
                             c_replies.replace_more()
                             for c_reply in c_replies: # look for a comment reply by OP
