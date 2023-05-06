@@ -247,9 +247,9 @@ async def post_checker():
             await asyncio.sleep(1) # prevents blocking
             op_provided_source = False # if this gets set to true, the comment will be edited thanking the user
             already_modded = False # if this gets set to true, the bot will not leave a comment
-            is_repost = False
-            is_oc = False
-            if submission.link_flair_text:
+            is_repost = False # based on flair
+            is_oc = False # based on flair
+            if submission.link_flair_text: # flair text should be required but just in case
                 if "REPOST" in submission.link_flair_text.upper():
                     is_repost = True
                 elif "OC" in submission.link_flair_text.upper():
@@ -259,37 +259,36 @@ async def post_checker():
                         already_modded = True # modded by someone else, let the humans handle it
                         break # no need to keep looking for stickied comments
                     elif comment.stickied: # mod commment by the bot
-                        already_modded = True # modded by the bot, no need for another comment
-                        if comment.body in [repost_text, oc_text]: # the post was flaired as a repost or OC at the time of the comment
-                            
-                            if (comment.body == repost_text) and is_oc:
-                                comment.edit(body=oc_text)
-                            elif (comment.body == oc_text) and is_repost:
-                                commment.edit(body=repost_text)
-                            
-                            c_replies = comment.replies
-                            c_replies.replace_more()
-                            for c_reply in c_replies: # look for a comment reply by OP
-                                if c_reply.author.name == submission.author.name:
-                                    if is_repost and "http" in c_reply.body:
-                                        op_provided_source = True
-                                        # do NOT break the loop, in case OP posted multiple comments and only one is the one with the link
-                                    elif is_oc:
-                                        op_provided_source = True
-                            if op_provided_source and is_repost:
-                                comment.edit(body=repost_thanks)
-                            elif is_repost:
-                                time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - comment.created_utc
-                                if time_delta > time_to_reply:
-                                    comment.edit(body=repost_shame)
-                                    submission.mod.remove(spam=False)
-                            elif op_provided_source and is_oc:
-                                comment.edit(body=oc_thanks)
-                            elif is_oc:
-                                time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - comment.created_utc
-                                if time_delta > time_to_reply:
-                                    comment.edit(body=oc_shame)
-                                    submission.mod.remove(spam=False)
+                        already_modded = True # modded by the bot, no need for another comment                            
+                        if (comment.body == repost_text) and is_oc:
+                            comment.edit(body=oc_text)
+                        elif (comment.body == oc_text) and is_repost:
+                            comment.edit(body=repost_text)
+                        
+                        c_replies = comment.replies
+                        c_replies.replace_more()
+                        for c_reply in c_replies: # look for a comment reply by OP
+                            if c_reply.author.name == submission.author.name:
+                                if is_repost and "http" in c_reply.body:
+                                    op_provided_source = True
+                                    # do NOT break the loop, in case OP posted multiple comments and only one is the one with the link
+                                elif is_oc:
+                                    op_provided_source = True
+                                    break # no need to keep searching for a comment from OP
+                        if op_provided_source and is_repost:
+                            comment.edit(body=repost_thanks)
+                        elif is_repost:
+                            time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - comment.created_utc
+                            if time_delta > time_to_reply:
+                                comment.edit(body=repost_shame)
+                                submission.mod.remove(spam=False)
+                        elif op_provided_source and is_oc:
+                            comment.edit(body=oc_thanks)
+                        elif is_oc:
+                            time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - comment.created_utc
+                            if time_delta > time_to_reply:
+                                comment.edit(body=oc_shame)
+                                submission.mod.remove(spam=False)
                         break # no need to keep looking for stickied comments
                                 
             if submission.approved_by:
