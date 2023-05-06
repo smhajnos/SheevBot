@@ -89,7 +89,62 @@ test_subreddit = reddit.subreddit("PrequelMemesTest")
  # | |___| (_) | | | | | | | | | | | (_| | | | | (_| \__ \
  #  \_____\___/|_| |_| |_|_| |_| |_|\__,_|_| |_|\__,_|___/
 
-# no commands right now. More to come!
+@bot.slash_command(name="ping",description="Check if the bot is working", guild_ids=[mod_server])
+async def ping(ctx):
+    await ctx.send("Pong!")
+    
+@bot.slash_command(name="set_config",description="Set a config parameter", guild_ids=[mod_server])
+async def set_config(ctx,parameter,value):
+    await ctx.send("Please wait...")
+    cfg_params_str = reddit.subreddit("PrequelMemes").wiki["sheevbotparams"].content_md
+    cfg_params = json.loads(cfg_params_str)
+    cfg = getconfig()
+    
+    success = False
+    error_msg = "Something unexpected went wrong."
+    cont = True # continue
+    try:
+        if parameter in cfg_params:
+            if cfg_params[parameter] == "int":
+                try:
+                    val = int(value)
+                except:
+                    cont = False
+                    success = False
+                    error_msg = "That isn't an integer."
+            elif cfg_params[parameter] == "str":
+                val = str(value)
+            else:
+                cont = False
+                success = False
+                error_msg = "The data type in the sheevbotparams page is invalid, please fix this before proceeding."
+                
+            if cont:   
+                if not parameter in cfg:
+                    success = False
+                    error_msg = "That parameter is not in the sheevbot page."
+                else:
+                    try:
+                        setconfig(parameter, val, who="{} (id:{})".format(ctx.user.display_name, ctx.user.id)) # record their id in case they set their username to another user's username
+                        success = True
+                    except:
+                        success = False
+                        error_msg = "I couldn't update the sheevbot page."
+        else:
+            success = False
+            error_msg = "That parameter is not in the sheevbotparams page."
+        
+        
+        
+    except:
+        success = False
+        error_msg = "Something unexpected went wrong."
+        
+    if success:
+        await ctx.send("Success!")
+    else:
+        await ctx.send(error_msg)
+    
 
  #  _______          _                 _____                           _                 
  # |__   __|        | |       ___     / ____|                         | |                
@@ -179,6 +234,7 @@ def setconfig(param, val):
 async def redditcheck():                                                                            
     for subreddit in subreddits:
         for i in [1,2]:
+            await asyncio.sleep(1) # prevents blocking
             try:
                 submission = subreddit.sticky(number=i)
             except:
@@ -264,7 +320,7 @@ async def post_checker():
                             comment.edit(body=oc_text)
                         elif (comment.body == oc_text) and is_repost:
                             comment.edit(body=repost_text)
-                        
+                        await asyncio.sleep(1) # prevents blocking
                         c_replies = comment.replies
                         c_replies.replace_more()
                         for c_reply in c_replies: # look for a comment reply by OP
