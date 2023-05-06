@@ -276,16 +276,14 @@ async def post_checker():
                                 time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - comment.created_utc
                                 if time_delta > time_to_reply:
                                     comment.edit(body=repost_shame)
-                                    submod = submission.mod()
-                                    submod.remove(spam=False)
+                                    submission.mod.remove(spam=False)
                             elif op_provided_source and is_oc:
                                 comment.edit(body=oc_thanks)
                             elif is_oc:
                                 time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - comment.created_utc
                                 if time_delta > time_to_reply:
                                     comment.edit(body=oc_shame)
-                                    submod = submission.mod()
-                                    submod.remove(spam=False)
+                                    submission.mod.remove(spam=False)
                         break # no need to keep looking for stickied comments
                                 
             if submission.approved_by:
