@@ -10,6 +10,7 @@ import sheevsecrets
 import datetime
 import json
 import sqlite3
+import math
 
 def login():
     username = "SheevBot"
@@ -137,3 +138,17 @@ def validateconfig():
     return retval
 
 
+def datestr():
+    now1 = datetime.datetime.now(datetime.timezone.utc)
+    date1 = datetime.datetime.fromtimestamp(1683426000, datetime.timezone.utc)
+    time_delta = date1 - now1
+    td = time_delta.days*24*60*60 + time_delta.seconds
+    hours = math.ceil(td/(60*60))
+    return "You can repost in {} hours.".format(hours)
+
+def datestr2():
+    now1 = datetime.datetime.now(datetime.timezone.utc).timestamp()
+    date1 = 1683426000
+    td = date1 - now1
+    hours = math.ceil(td/(60*60))
+    return "You can repost in {} hours.".format(hours)

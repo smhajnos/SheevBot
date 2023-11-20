@@ -18,6 +18,7 @@ import sqlite3
 import datetime
 import json
 import time
+import math
 
 selector = selectors.SelectSelector()
 loop = asyncio.SelectorEventLoop(selector)
@@ -293,6 +294,7 @@ async def post_checker():
     repost_shame = cfg["repost_shame"]
     oc_shame = cfg["oc_shame"]
     time_to_reply = float(cfg["time_to_reply"])
+    repost_cooldown = float(cfg["repost_cooldown"])
     post_count = 0
     #check_subreddits = subreddits
     check_subreddits = [test_subreddit]
@@ -350,6 +352,12 @@ async def post_checker():
             if submission.approved_by:
                 already_modded = True              
             if not already_modded and is_repost:
+                time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - submission.created_utc
+                if time_delta < repost_cooldown:
+                    # TODO: FIX
+                    hours = math.ceil(time_delta/(60*60))
+                    comment = submission.reply(body="You can repost in {} hours".format(hours))
+                    comment.mod.distinguish(sticky=True)
                 comment = submission.reply(body=repost_text)
                 comment.mod.distinguish(sticky=True)
             if not already_modded and is_oc:
