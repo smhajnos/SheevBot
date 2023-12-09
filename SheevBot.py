@@ -293,8 +293,8 @@ async def post_checker():
     ignore_after = float(cfg["ignore_after"])
     #repost_cooldown = float(cfg["repost_cooldown"])
     post_count = 0
-    #check_subreddits = subreddits
-    check_subreddits = [test_subreddit]
+    check_subreddits = subreddits
+    #check_subreddits = [test_subreddit]
     for sub_to_check in check_subreddits:
         new_posts = sub_to_check.new(limit=100)
         for submission in new_posts:
