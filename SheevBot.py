@@ -290,6 +290,7 @@ async def post_checker():
         return
     cfg = getconfig()
     time_to_reply = float(cfg["time_to_reply"])
+    ignore_after = float(cfg["ignore_after"])
     #repost_cooldown = float(cfg["repost_cooldown"])
     post_count = 0
     #check_subreddits = subreddits
@@ -298,132 +299,136 @@ async def post_checker():
         new_posts = sub_to_check.new(limit=100)
         for submission in new_posts:
             try:
-                post_count += 1
-                await asyncio.sleep(1) # prevents blocking
-                op_provided_source = False # if this gets set to true, the comment will be edited thanking the user
-                already_modded = False # if this gets set to true, the bot will not leave a comment
-                is_repost = False # based on flair
-                is_oc = False # based on flair
-                is_crosspost = False # based on... well if it is a crosspost
-                to_remove = False # depends on whether the OP has replied to the comment properly. 
-                # to_remove gets set, then later the age of the bot comment is checked and if both are satisfied the post is removed.
-                bot_comment = None
-                
-                if submission.link_flair_text: # flair text should be required but just in case
-                    if "REPOST" in submission.link_flair_text.upper():
-                        is_repost = True
-                    elif "OC" in submission.link_flair_text.upper():
-                        is_oc = True
+                time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - submission.created_utc
+                if time_delta > ignore_after:
+                    pass
+                else:
+                    post_count += 1
+                    await asyncio.sleep(1) # prevents blocking
+                    op_provided_source = False # if this gets set to true, the comment will be edited thanking the user
+                    already_modded = False # if this gets set to true, the bot will not leave a comment
+                    is_repost = False # based on flair
+                    is_oc = False # based on flair
+                    is_crosspost = False # based on... well if it is a crosspost
+                    to_remove = False # depends on whether the OP has replied to the comment properly. 
+                    # to_remove gets set, then later the age of the bot comment is checked and if both are satisfied the post is removed.
+                    bot_comment = None
+                    
+                    if submission.link_flair_text: # flair text should be required but just in case
+                        if "REPOST" in submission.link_flair_text.upper():
+                            is_repost = True
+                        elif "OC" in submission.link_flair_text.upper():
+                            is_oc = True
+                        else:
+                            already_modded = True # only other flair is the mod flair
                     else:
-                        already_modded = True # only other flair is the mod flair
-                else:
-                    already_modded = True # they didn't flair it. Shouldn't be possible so ignore the post.
-                    #await log("I found a post without a flair! {}".format(submission.url))
-            
-                if hasattr(submission, "crosspost_parent"):
-                    is_crosspost = True
-                else:
-                    is_crosspost = False
+                        already_modded = True # they didn't flair it. Shouldn't be possible so ignore the post.
+                        #await log("I found a post without a flair! {}".format(submission.url))
                 
-                if submission.approved_by: #approved (by a human, this bot will never approve posts only remove them)
-                    already_modded = True
-                for comment in submission.comments:
-                    if comment.stickied and not comment.author.name == "SheevBot":
-                        already_modded = True # modded by someone else, let the humans handle it
-                        
-                if not already_modded:
+                    if hasattr(submission, "crosspost_parent"):
+                        is_crosspost = True
+                    else:
+                        is_crosspost = False
+                    
+                    if submission.approved_by: #approved (by a human, this bot will never approve posts only remove them)
+                        already_modded = True
                     for comment in submission.comments:
-                        if comment.stickied: # mod commment by the bot
-                            already_modded = True # modded by the bot, no need for another comment
-                            bot_comment = comment
-                            await asyncio.sleep(1) # prevents blocking
-                            c_replies = comment.replies
-                            c_replies.replace_more()
-                            for c_reply in c_replies: # look for a comment reply by OP
-                                if c_reply.author.name == submission.author.name: 
-                                    # Here, we found a comment by OP. 
-                                    # Now we will check if the OP has provided a source (if it is a repost and not a crosspost).
-                                    # If it is OC or a crosspost, we will just check for a reply by OP.
-                                    if "http" in c_reply.body:
-                                        op_provided_source = True
-                                        # do NOT break the loop, in case OP posted multiple comments and only one is the one with the link
-                                    elif is_oc or is_crosspost:
-                                        op_provided_source = True
-                                        break 
-                                        # break because no need to keep searching for a comment from OP.
-                                        # If it is OC or a crosspost, only requirement is that OP replied to the bot.
-                                        
-                    
-                                                    
-                    # Now, we decide what to do with the comment
-                    if bot_comment:
-                        time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - bot_comment.created_utc
-                        too_late = (time_delta > time_to_reply)
-                        if is_oc and is_crosspost: # crosspost flaired as OC
-                            if op_provided_source: # This just means OP replied
-                                desired_text = cfg["crosspost_oc_thanks"]
-                                to_remove = False
-                            elif too_late: # Mod comment is too old; OP took too long
-                                desired_text = cfg["crosspost_oc_shame"]
-                                to_remove = True
-                            else: # OP hasn't replied yet, but it hasn't been long enough to remove the post
-                                desired_text = cfg["crosspost_oc_text"]
-                                to_remove = False
-                        elif is_repost and is_crosspost: # crosspost flaired as a repost
-                            if op_provided_source: # This just means OP replied
-                                desired_text = cfg["crosspost_repost_thanks"]
-                                to_remove = False
-                            elif too_late: # Mod comment is too old; OP took too long
-                                desired_text = cfg["crosspost_repost_shame"]
-                                to_remove = True
-                            else: # OP hasn't replied yet, but it hasn't been long enough to remove the post
-                                desired_text = cfg["crosspost_repost_text"]
-                                to_remove = False
-                        elif is_oc: # Flaired as OC, is not a crosspost
-                            if op_provided_source: # This just means OP replied
-                                desired_text = cfg["oc_thanks"]
-                                to_remove = False
-                            elif too_late: # Mod comment is too old; OP took too long
-                                desired_text = cfg["oc_shame"]
-                                to_remove = True
-                            else: # OP hasn't replied yet, but it hasn't been long enough to remove the post
-                                desired_text = cfg["oc_text"]
-                                to_remove = False
-                        elif is_repost:
-                            if op_provided_source: # This just means OP replied
-                                desired_text = cfg["repost_thanks"]
-                                to_remove = False
-                            elif too_late: # Mod comment is too old; OP took too long (or replied, but didn't provide a link)
-                                desired_text = cfg["repost_shame"]
-                                to_remove = True
-                            else: # OP hasn't replied with a link yet, but it hasn't been long enough to remove the post
-                                desired_text = cfg["repost_text"]
-                                to_remove = False
+                        if comment.stickied and not comment.author.name == "SheevBot":
+                            already_modded = True # modded by someone else, let the humans handle it
                             
+                    if not already_modded:
+                        for comment in submission.comments:
+                            if comment.stickied: # mod commment by the bot
+                                already_modded = True # modded by the bot, no need for another comment
+                                bot_comment = comment
+                                await asyncio.sleep(1) # prevents blocking
+                                c_replies = comment.replies
+                                c_replies.replace_more()
+                                for c_reply in c_replies: # look for a comment reply by OP
+                                    if c_reply.author.name == submission.author.name: 
+                                        # Here, we found a comment by OP. 
+                                        # Now we will check if the OP has provided a source (if it is a repost and not a crosspost).
+                                        # If it is OC or a crosspost, we will just check for a reply by OP.
+                                        if "http" in c_reply.body:
+                                            op_provided_source = True
+                                            # do NOT break the loop, in case OP posted multiple comments and only one is the one with the link
+                                        elif is_oc or is_crosspost:
+                                            op_provided_source = True
+                                            break 
+                                            # break because no need to keep searching for a comment from OP.
+                                            # If it is OC or a crosspost, only requirement is that OP replied to the bot.
                                             
-                            
-                                    
-                        # Now, time to take action.
-                        if bot_comment.body != desired_text:
-                            bot_comment.edit(desired_text)
-                        if to_remove:
-                            submission.mod.remove(spam=False)
-                        already_modded = True                
-                    
-                    else: # No human mod has approved and this bot has not already made a comment
-                        # Get default text for the flair/crosspost condition
-                        if is_oc and is_crosspost:
-                            desired_text = cfg["crosspost_oc_text"]
-                        elif is_repost and is_crosspost:
-                            desired_text = cfg["crosspost_repost_text"]
-                        elif is_oc:
-                            desired_text = cfg["oc_text"]
-                        elif is_repost:
-                            desired_text = cfg["repost_text"]
-                    
-                        # Post the comment
-                        bot_comment = submission.reply(body=desired_text)
-                        bot_comment.mod.distinguish(sticky=True)
+                        
+                                                        
+                        # Now, we decide what to do with the comment
+                        if bot_comment:
+                            time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - bot_comment.created_utc
+                            too_late = (time_delta > time_to_reply)
+                            if is_oc and is_crosspost: # crosspost flaired as OC
+                                if op_provided_source: # This just means OP replied
+                                    desired_text = cfg["crosspost_oc_thanks"]
+                                    to_remove = False
+                                elif too_late: # Mod comment is too old; OP took too long
+                                    desired_text = cfg["crosspost_oc_shame"]
+                                    to_remove = True
+                                else: # OP hasn't replied yet, but it hasn't been long enough to remove the post
+                                    desired_text = cfg["crosspost_oc_text"]
+                                    to_remove = False
+                            elif is_repost and is_crosspost: # crosspost flaired as a repost
+                                if op_provided_source: # This just means OP replied
+                                    desired_text = cfg["crosspost_repost_thanks"]
+                                    to_remove = False
+                                elif too_late: # Mod comment is too old; OP took too long
+                                    desired_text = cfg["crosspost_repost_shame"]
+                                    to_remove = True
+                                else: # OP hasn't replied yet, but it hasn't been long enough to remove the post
+                                    desired_text = cfg["crosspost_repost_text"]
+                                    to_remove = False
+                            elif is_oc: # Flaired as OC, is not a crosspost
+                                if op_provided_source: # This just means OP replied
+                                    desired_text = cfg["oc_thanks"]
+                                    to_remove = False
+                                elif too_late: # Mod comment is too old; OP took too long
+                                    desired_text = cfg["oc_shame"]
+                                    to_remove = True
+                                else: # OP hasn't replied yet, but it hasn't been long enough to remove the post
+                                    desired_text = cfg["oc_text"]
+                                    to_remove = False
+                            elif is_repost:
+                                if op_provided_source: # This just means OP replied
+                                    desired_text = cfg["repost_thanks"]
+                                    to_remove = False
+                                elif too_late: # Mod comment is too old; OP took too long (or replied, but didn't provide a link)
+                                    desired_text = cfg["repost_shame"]
+                                    to_remove = True
+                                else: # OP hasn't replied with a link yet, but it hasn't been long enough to remove the post
+                                    desired_text = cfg["repost_text"]
+                                    to_remove = False
+                                
+                                                
+                                
+                                        
+                            # Now, time to take action.
+                            if bot_comment.body != desired_text:
+                                bot_comment.edit(desired_text)
+                            if to_remove:
+                                submission.mod.remove(spam=False)
+                            already_modded = True                
+                        
+                        else: # No human mod has approved and this bot has not already made a comment
+                            # Get default text for the flair/crosspost condition
+                            if is_oc and is_crosspost:
+                                desired_text = cfg["crosspost_oc_text"]
+                            elif is_repost and is_crosspost:
+                                desired_text = cfg["crosspost_repost_text"]
+                            elif is_oc:
+                                desired_text = cfg["oc_text"]
+                            elif is_repost:
+                                desired_text = cfg["repost_text"]
+                        
+                            # Post the comment
+                            bot_comment = submission.reply(body=desired_text)
+                            bot_comment.mod.distinguish(sticky=True)
                     
             except:
                 await log("Something went wrong processing this post: {}".format(submission.url), emergent=True)
