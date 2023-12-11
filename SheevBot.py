@@ -166,22 +166,22 @@ async def validateconfig(sub="PrequelMemes"):
     
     retval = True
     
-    #try:
-    for p in params: # p = parameter, t = type ("int" or "str")
-        t = params[p]    
-        if t == "int":
-            try:
-                x = int(cfg[p])
-            except:
-                await log("Type mismatch in subreddit {} parameter {}.".format(sub,p))
+    try:
+        for p in params: # p = parameter, t = type ("int" or "str")
+            t = params[p]    
+            if t == "int":
+                try:
+                    x = int(cfg[p])
+                except:
+                    await log("Type mismatch in subreddit {} parameter {}.".format(sub,p))
+                    retval = False
+            elif t == "str":
+                pass # should always be okay?
+            else:
+                await log("Bad type in sheevbotparams for parameter {}.".format(p), emergent=True)
                 retval = False
-        elif t == "str":
-            pass # should always be okay?
-        else:
-            await log("Bad type in sheevbotparams for parameter {}.".format(p), emergent=True)
-            retval = False
-    #except:
-    #    retval = False   
+    except:
+        retval = False   
     return retval
     
     
