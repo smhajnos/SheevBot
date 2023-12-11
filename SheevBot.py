@@ -299,10 +299,6 @@ async def post_checker():
         new_posts = sub_to_check.new(limit=100)
         for submission in new_posts:
             try:
-                time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - submission.created_utc
-                if time_delta > ignore_after:
-                    pass
-                else:
                     post_count += 1
                     await asyncio.sleep(1) # prevents blocking
                     op_provided_source = False # if this gets set to true, the comment will be edited thanking the user
@@ -416,19 +412,23 @@ async def post_checker():
                             already_modded = True                
                         
                         else: # No human mod has approved and this bot has not already made a comment
-                            # Get default text for the flair/crosspost condition
-                            if is_oc and is_crosspost:
-                                desired_text = cfg["crosspost_oc_text"]
-                            elif is_repost and is_crosspost:
-                                desired_text = cfg["crosspost_repost_text"]
-                            elif is_oc:
-                                desired_text = cfg["oc_text"]
-                            elif is_repost:
-                                desired_text = cfg["repost_text"]
-                        
-                            # Post the comment
-                            bot_comment = submission.reply(body=desired_text)
-                            bot_comment.mod.distinguish(sticky=True)
+                            time_delta = datetime.datetime.now(datetime.timezone.utc).timestamp() - submission.created_utc
+                            if time_delta > ignore_after: # the post is too old and it would be unfair to require them to respond
+                                pass
+                            else:
+                                # Get default text for the flair/crosspost condition
+                                if is_oc and is_crosspost:
+                                    desired_text = cfg["crosspost_oc_text"]
+                                elif is_repost and is_crosspost:
+                                    desired_text = cfg["crosspost_repost_text"]
+                                elif is_oc:
+                                    desired_text = cfg["oc_text"]
+                                elif is_repost:
+                                    desired_text = cfg["repost_text"]
+                            
+                                # Post the comment
+                                bot_comment = submission.reply(body=desired_text)
+                                bot_comment.mod.distinguish(sticky=True)
                     
             except:
                 await log("Something went wrong processing this post: {}".format(submission.url), emergent=True)
