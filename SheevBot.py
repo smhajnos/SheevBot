@@ -173,18 +173,18 @@ async def validateconfig():
     return retval
     
     
-def getconfig():
-    cfg_str = reddit.subreddit("PrequelMemes").wiki["sheevbot"].content_md
+def getconfig(sub="PrequelMemes"):
+    cfg_str = reddit.subreddit(sub).wiki["sheevbot"].content_md
     cfg = json.loads(cfg_str)
     return cfg
         
     
-def setconfig(param,value,who="Unknown"):
-    cfg_str = reddit.subreddit("PrequelMemes").wiki["sheevbot"].content_md
+def setconfig(param,value,who="Unknown",sub="PrequelMemes"):
+    cfg_str = reddit.subreddit(sub).wiki["sheevbot"].content_md
     cfg = json.loads(cfg_str)
     cfg[param] = value
     cfg_str = json.dumps(cfg, sort_keys=True, indent=4)
-    reddit.subreddit("PrequelMemes").wiki["sheevbot"].edit(content=cfg_str,reason="Config updated by {0} by command.".format(who))
+    reddit.subreddit(sub).wiki["sheevbot"].edit(content=cfg_str,reason="Config updated by {0} by command.".format(who))
     
     
 """
@@ -406,7 +406,7 @@ async def post_checker():
                                         
                             # Now, time to take action.
                             if bot_comment.body != desired_text:
-                                bot_comment.edit(desired_text)
+                                bot_comment.edit(body=desired_text)
                             if to_remove:
                                 submission.mod.remove(spam=False)
                             already_modded = True                
