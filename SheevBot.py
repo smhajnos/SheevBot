@@ -157,6 +157,7 @@ def commit():
     #backup to cloud?                                                                                     
 
 async def validateconfig(sub="PrequelMemes"):
+    print("Validating config for subreddit {}".format(sub))
     cfg_str = reddit.subreddit(sub).wiki["sheevbot"].content_md
     cfg = json.loads(cfg_str)
     
@@ -165,25 +166,27 @@ async def validateconfig(sub="PrequelMemes"):
     
     retval = True
     
-    try:
-        for p, t in params: # p = parameter, t = type ("int" or "str")
-            if t == "int":
-                try:
-                    x = int(cfg[p])
-                except:
-                    await log("Type mismatch in subreddit {} parameter {}.".format(sub,p))
-                    retval = False
-            elif t == "str":
-                pass # should always be okay?
-            else:
-                await log("Bad type in sheevbotparams for parameter {}.".format(p), emergent=True)
+    #try:
+    for p in params: # p = parameter, t = type ("int" or "str")
+        t = params[p]    
+        if t == "int":
+            try:
+                x = int(cfg[p])
+            except:
+                await log("Type mismatch in subreddit {} parameter {}.".format(sub,p))
                 retval = False
-    except:
-        retval = False   
+        elif t == "str":
+            pass # should always be okay?
+        else:
+            await log("Bad type in sheevbotparams for parameter {}.".format(p), emergent=True)
+            retval = False
+    #except:
+    #    retval = False   
     return retval
     
     
 def getconfig(sub="PrequelMemes"):
+    print("getting config from {}".format(sub))
     cfg_str = reddit.subreddit(sub).wiki["sheevbot"].content_md
     cfg = json.loads(cfg_str)
     return cfg
@@ -274,9 +277,10 @@ async def post_checker():
     post_count = 0
     check_subreddits = subreddits
     for sub_to_check in check_subreddits:
-        config_good = await validateconfig(sub_to_check.name)
+        print("Checking sub {}".format(sub_to_check.display_name))
+        config_good = await validateconfig(sub_to_check.display_name)
         if config_good:
-            cfg = getconfig(sub_to_check.name)
+            cfg = getconfig(sub_to_check.display_name)
             time_to_reply = float(cfg["time_to_reply"])
             ignore_after = float(cfg["ignore_after"])
             new_posts = sub_to_check.new(limit=100)
@@ -417,7 +421,7 @@ async def post_checker():
                     await log("Something went wrong processing this post: {}".format(submission.url), emergent=True)
                     
         else: #config isn't good
-            await log("Something is wrong with the config wiki page for the following subreddit: {}".format(sub_to_check.name), emergent=True)
+            await log("Something is wrong with the config wiki page for the following subreddit: {}".format(sub_to_check.display_name), emergent=True)
     
     
 
