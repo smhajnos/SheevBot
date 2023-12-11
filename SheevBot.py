@@ -176,7 +176,7 @@ async def validateconfig(sub="PrequelMemes"):
                     await log("Type mismatch in subreddit {} parameter {}.".format(sub,p))
                     retval = False
             elif t == "str":
-                pass # should always be okay?
+                pass # should always be okay? most things can be typecast into strings if they put it wrong.
             else:
                 await log("Bad type in sheevbotparams for parameter {}.".format(p), emergent=True)
                 retval = False
