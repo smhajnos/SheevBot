@@ -391,7 +391,7 @@ async def post_checker():
                                     bot_comment.mod.distinguish(sticky=True)
                         
                 except:
-                    await log("Something went wrong processing this post: {}".format(submission.url), emergent=True)
+                    await log("Something went wrong processing this post: https://www.reddit.com{}".format(submission.permalink), emergent=True)
                     
         else: #config isn't good
             await log("Something is wrong with the config wiki page for the following subreddit: {}".format(sub_to_check.display_name), emergent=True)
