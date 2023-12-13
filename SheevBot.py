@@ -92,57 +92,6 @@ test_subreddit = reddit.subreddit("PrequelMemesTest")
 async def ping(ctx):
     await ctx.send("Pong!")
     
-@bot.slash_command(name="set_config",description="Set a config parameter", guild_ids=[mod_server])
-async def set_config(ctx,parameter,value):
-    await ctx.send("Please wait...")
-    cfg_params_str = reddit.subreddit("PrequelMemes").wiki["sheevbotparams"].content_md
-    cfg_params = json.loads(cfg_params_str)
-    cfg = getconfig()
-    
-    success = False
-    error_msg = "Something unexpected went wrong."
-    cont = True # continue
-    try:
-        if parameter in cfg_params:
-            if cfg_params[parameter] == "int":
-                try:
-                    val = int(value)
-                except:
-                    cont = False
-                    success = False
-                    error_msg = "That isn't an integer."
-            elif cfg_params[parameter] == "str":
-                val = str(value)
-            else:
-                cont = False
-                success = False
-                error_msg = "The data type in the sheevbotparams page is invalid, please fix this before proceeding."
-                
-            if cont:   
-                if not parameter in cfg:
-                    success = False
-                    error_msg = "That parameter is not in the sheevbot page."
-                else:
-                    try:
-                        setconfig(parameter, val, who="{} (id:{})".format(ctx.user.display_name, ctx.user.id)) # record their id in case they set their username to another user's username
-                        success = True
-                    except:
-                        success = False
-                        error_msg = "I couldn't update the sheevbot page."
-        else:
-            success = False
-            error_msg = "That parameter is not in the sheevbotparams page."
-        
-        
-        
-    except:
-        success = False
-        error_msg = "Something unexpected went wrong."
-        
-    if success:
-        await ctx.send("Success!")
-    else:
-        await ctx.send(error_msg)
     
 
  #  _______          _                 _____                           _                 
@@ -191,13 +140,6 @@ def getconfig(sub="PrequelMemes"):
     cfg = json.loads(cfg_str)
     return cfg
         
-    
-def setconfig(param,value,who="Unknown",sub="PrequelMemes"):
-    cfg_str = reddit.subreddit(sub).wiki["sheevbot"].content_md
-    cfg = json.loads(cfg_str)
-    cfg[param] = value
-    cfg_str = json.dumps(cfg, sort_keys=True, indent=4)
-    reddit.subreddit(sub).wiki["sheevbot"].edit(content=cfg_str,reason="Config updated by {0} by command.".format(who))
 
  #  _______        _       
  # |__   __|      | |      
