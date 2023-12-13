@@ -254,7 +254,7 @@ async def post_checker():
             cfg = getconfig(sub_to_check.display_name)
             time_to_reply = float(cfg["time_to_reply"])
             ignore_after = float(cfg["ignore_after"])
-            new_posts = sub_to_check.new(limit=100)
+            new_posts = sub_to_check.new(limit=10)
             for submission in new_posts:
                 try:
                         post_count += 1
