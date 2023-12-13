@@ -152,3 +152,10 @@ def datestr2():
     td = date1 - now1
     hours = math.ceil(td/(60*60))
     return "You can repost in {} hours.".format(hours)
+
+
+def getflairs():
+    reddit = login()
+    cfg_str = reddit.subreddit("SequelMemes").wiki["sheevbot"].content_md
+    cfg = json.loads(cfg_str)
+    return cfg["oc_flairs"]

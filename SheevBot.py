@@ -122,15 +122,44 @@ async def validateconfig(sub="PrequelMemes"):
                 try:
                     x = int(cfg[p])
                 except:
-                    await log("Type mismatch in subreddit {} parameter {}.".format(sub,p))
+                    await log("Type mismatch in subreddit {} parameter {}.".format(sub,p), emergent=True)
                     retval = False
             elif t == "str":
-                pass # should always be okay? most things can be typecast into strings if they put it wrong.
+                if not isinstance(cfg[p], str):
+                    await log("Type mismatch in subreddit {} parameter {}.".format(sub,p), emergent=True)
+                    retval = False
+            elif t == "list":
+                if not isinstance(cfg[p], list):
+                    await log("Type mismatch in subreddit {} parameter {}.".format(sub,p), emergent=True)
+                    retval = False
+            elif t == "list:str":
+                if not isinstance(cfg[p], list):
+                    await log("Type mismatch in subreddit {} parameter {}.".format(sub,p), emergent=True)
+                    retval = False
+                elif len(cfg[p]) > 0:
+                    for i in cfg[p]:
+                        if not isinstance(i, str):
+                            retval = False
+                    if not retval:
+                        await log("Type mismatch in subreddit {} parameter {}.".format(sub,p), emergent=True)
+            elif t == "list:int":
+                if not isinstance(cfg[p], list):
+                    await log("Type mismatch in subreddit {} parameter {}.".format(sub,p), emergent=True)
+                    retval = False
+                elif len(cfg[p]) > 0:
+                    for i in cfg[p]:
+                        try:
+                            x = int(i)
+                        except:
+                            retval = False
+                    if not retval:
+                        await log("Type mismatch in subreddit {} parameter {}.".format(sub,p))
             else:
                 await log("Bad type in sheevbotparams for parameter {}.".format(p), emergent=True)
                 retval = False
     except:
         retval = False   
+        await log("Something went wrong validating sheevbot paramters for subreddit {}".format(sub), emergent=True)
     return retval
     
     
@@ -240,12 +269,14 @@ async def post_checker():
                         bot_comment = None
                         
                         if submission.link_flair_text: # flair text should be required but just in case
-                            if "REPOST" in submission.link_flair_text.upper():
+                            flair_text = submission.link_flair_text
+                            if flair_text in cfg["repost_flairs"]:
                                 is_repost = True
-                            elif "OC" in submission.link_flair_text.upper():
+                            elif flair_text in cfg["oc_flairs"]:
                                 is_oc = True
-                            else:
-                                already_modded = True # only other flair is the mod flair
+                            else: # presumably, the only other flair options are the ones mods can use. Otherwise, this is not configured correctly.
+                                already_modded = True
+                            
                         else:
                             already_modded = True # they didn't flair it. Shouldn't be possible so ignore the post.
                             #await log("I found a post without a flair! {}".format(submission.url))
