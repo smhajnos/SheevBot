@@ -61,7 +61,7 @@ reddit = praw.Reddit(client_id=sheevsecrets.REDDIT_CLIENT_ID,
                      password=sheevsecrets.REDDIT_PASSWORD,
                      user_agent='SheevBot, the /r/PrequelMemes mod bot',
                      username=username)  
-subreddit_names = ["PrequelMemes", "PrequelMemesTest"]
+subreddit_names = ["PrequelMemes", "PrequelMemesTest","SequelMemes"]
 #subreddit_names = ["PrequelMemesTest"]
 subreddits = []
 for s in subreddit_names:
