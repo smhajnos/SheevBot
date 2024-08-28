@@ -189,7 +189,7 @@ def getconfig(sub="PrequelMemes"):
  #  ____) | (__| | | |  __/ (_| | |_| | |  __/ (_| |    | | (_| \__ \   <\__ \
  # |_____/ \___|_| |_|\___|\__,_|\__,_|_|\___|\__,_|    |_|\__,_|___/_|\_\___/
                                                                             
-@tasks.loop(seconds=60)
+@tasks.loop(seconds=3600)
 async def redditcheck():                                                                            
     for subreddit in subreddits:
         for i in [1,2]:
