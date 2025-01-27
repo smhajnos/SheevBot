@@ -17,6 +17,7 @@ import praw
 import sqlite3
 import datetime
 import json
+import sheevcloud
 
 selector = selectors.SelectSelector()
 loop = asyncio.SelectorEventLoop(selector)
@@ -391,7 +392,7 @@ async def post_checker():
                                     bot_comment.mod.distinguish(sticky=True)
                         
                 except:
-                    await log("Something went wrong processing this post: https://www.reddit.com{}".format(submission.permalink), emergent=True)
+                    await log("Something went wrong processing this post: https://www.reddit.com{}".format(submission.permalink), emergent=False)
                     
         else: #config isn't good
             await log("Something is wrong with the config wiki page for the following subreddit: {}".format(sub_to_check.display_name), emergent=True)
