@@ -39,8 +39,11 @@ intents = nextcord.Intents.all()
 #intents.members = True
 
 
-dataWarehouse = sqlite3.connect("datawarehouse.db")
-cursor = dataWarehouse.cursor()
+#dataWarehouse = sqlite3.connect("datawarehouse.db")
+#cursor = dataWarehouse.cursor()
+dataWarehouse = None
+cursor = None
+
 
 bot = commands.Bot(command_prefix='$', intents=intents)
 
@@ -93,6 +96,16 @@ test_subreddit = reddit.subreddit("PrequelMemesTest")
 async def ping(ctx):
     await ctx.send("Pong!")
     
+@bot.slash_command(name="download_sheevfiles",description="Please don't use this command if you don't know what you are doing.",guild_ids=[mod_server])
+async def download_sheevfiles(ctx):
+    sheevcloud.download_all()
+    await ctx.send("Done!")
+
+@bot.slash_command(name="upload_sheevfiles",description="Please don't use this command if you don't know what you are doing.",guild_ids=[mod_server])
+async def upload_sheevfiles(ctx):
+    sheevcloud.upload_all()
+    await ctx.send("Done!")
+    
     
 
  #  _______          _                 _____                           _                 
@@ -104,7 +117,7 @@ async def ping(ctx):
                                                                                        
 def commit():
     dataWarehouse.commit()
-    #backup to cloud?                                                                                     
+    #backup to cloud? - no do this one a separate call to avoid extra writes                                                                                  
 
 async def validateconfig(sub="PrequelMemes"):
     print("Validating config for subreddit {}".format(sub))
@@ -208,6 +221,7 @@ async def redditcheck():
                     await ch.send("New Modpost by /u/{}:\r\n\r\nhttps://www.reddit.com{}".format(submission.author.name, submission.permalink))
                     cursor.execute("INSERT INTO modposts (post) VALUES (?)",(submission.id,))
                     commit()
+                    sheevcloud.upload_file("datawarehouse.db")
             else:
                 print("No sticky #{} found in {}".format(i,subreddit.display_name))
                                                                               
@@ -418,4 +432,7 @@ async def on_ready():
         postchecktask.start()
     
 print("Starting bot")
+sheevcloud.download_all()
+dataWarehouse = sqlite3.connect("savedata/datawarehouse.db")
+cursor = dataWarehouse.cursor()
 bot.run(sheevsecrets.DISCORD_TOKEN)
