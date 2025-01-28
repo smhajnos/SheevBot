@@ -18,6 +18,11 @@ import sqlite3
 import datetime
 import json
 import sheevcloud
+import matplotlib.pyplot as plt
+import numpy as np
+from PIL import Image, ImageDraw
+
+
 
 selector = selectors.SelectSelector()
 loop = asyncio.SelectorEventLoop(selector)
@@ -30,7 +35,8 @@ servers = [mod_server]
 
 channels = {
     "log":1098770267372789832,
-    "modposts":895323724260188191
+    "modposts":895323724260188191,
+    "scoreboard":522946568089894932
     }
 
 sheev_color = 0xfc036f
@@ -106,7 +112,105 @@ async def upload_sheevfiles(ctx):
     sheevcloud.upload_all()
     await ctx.send("Done!")
     
+
+@bot.slash_command(name="report",description="Generate a mod report for the previous month", guild_ids=[mod_server])
+async def report(ctx):
+    await ctx.send("Working on it...")
+    reasons = ["removecomment","approvecomment","spamcomment","removelink","approvelink","removecomment","banuser","unbanuser"]
+    row_header = ["mod","Xc","✓c","Sc","Xp","✓p","Sp","Xu","✓u","all","%"]
+            
+    # collect data
+    tempdatadb = sqlite3.connect("tempdata/temp.db")
+    tdcursor = tempdatadb.cursor()
+    now = datetime.datetime.now()
+    if now.month == 1:
+        startdate = datetime.datetime(now.year - 1, 12, 1, 0, 0, 0)
+        enddate = datetime.datetime(now.year      ,  1, 1, 0, 0, 0)
+    else:
+        startdate = datetime.datetime(now.year, now.month - 1, 1, 0, 0, 0)
+        enddate = datetime.datetime(now.year, now.month    , 1, 0, 0, 0)
     
+    print("Getting data between {} and {} ({} and {})".format(startdate, enddate, startdate.timestamp(), enddate.timestamp()))
+    tdcursor.execute("DELETE FROM modactions")
+    
+    subs = ["PrequelMemes", "SequelMemes"]
+    for tsub in subs:
+        sub = reddit.subreddit(tsub)        
+        modlog = sub.mod.log(limit=5000)
+ 
+        
+        for log in modlog: # results are returned most recent first
+            if log.created_utc < enddate.timestamp() and log.action in reasons:
+                tdcursor.execute("INSERT INTO modactions (mod, timestamp, action, subreddit) VALUES (?, ?, ?, ?)",(log._mod, log.created_utc, log.action, log.subreddit,))
+            elif log.created_utc < startdate.timestamp():
+                break
+            
+    tempdatadb.commit()
+    
+    
+    # process data
+    modlist = []
+    tempdatadb = sqlite3.connect("tempdata/temp.db")
+    tdcursor = tempdatadb.cursor()
+    tdcursor.execute("SELECT DISTINCT mod FROM modactions ORDER BY mod")
+    for row in tdcursor:
+        modlist.append(row[0])
+    actionmatrix = [row_header]
+    
+    for reason in reasons:
+        totals = ["total"]
+        for reason in reasons:
+            tdcursor.execute("SELECT COUNT(*) FROM modactions WHERE action = ?", (reason,))
+            res = tdcursor.fetchone()
+            totals.append(res[0])
+        tdcursor.execute("SELECT COUNT(*) FROM modactions")
+        res = tdcursor.fetchone()
+        total_actions = res[0]
+        totals.append(total_actions)
+        totals.append("100%")
+
+    for mod in modlist:
+        modactions = [mod]
+        for reason in reasons:
+            tdcursor.execute("SELECT COUNT(*) FROM modactions WHERE mod = ? AND action = ?", (mod, reason,))
+            res = tdcursor.fetchone()
+            modactions.append(res[0])
+        tdcursor.execute("SELECT COUNT(*) FROM modactions WHERE mod = ?", (mod,))
+        res = tdcursor.fetchone()
+        modactions.append(res[0])
+        modactions.append("{:.0f}%".format(res[0]*100/total_actions))
+        actionmatrix.append(modactions)
+        
+    actionmatrix.append(totals)
+    for row in actionmatrix:
+        print(len(row),row)
+            
+    fig, ax = plt.subplots()
+    
+    grid = np.flip(np.array(actionmatrix),0)
+    
+    ax.set_xlim([-3,grid.shape[0]])
+    ax.set_ylim([0,grid.shape[1]])
+    
+    
+    ax.text(-5,0, "total", ha="center", va="center", fontweight="bold")
+    for j in range(1, grid.shape[1]):
+        ax.text(j*2,0, grid[0,j], ha="center", va="center", fontweight="bold")
+    for i in range(1, grid.shape[0]-1):
+        ax.text(-5,i, grid[i,0], ha="center", va="center")
+        for j in range(1, grid.shape[1]):
+            ax.text(j*2,i, grid[i,j], ha="center", va="center")
+    i = grid.shape[0]-1
+    ax.text(-5,i, grid[i,0], ha="center", va="center", fontweight="bold")
+    for j in range(1, grid.shape[1]):
+        ax.text(j*2,i, grid[i,j], ha="center", va="center", fontweight="bold")
+            
+    ax.axis("off")
+    
+    plt.savefig("tempdata/actionmatrix.png", bbox_inches='tight')
+    
+    ch = bot.get_channel(channels["scoreboard"])
+    await ch.send(content=startdate.strftime("%B %Y"),file=nextcord.File("tempdata/actionmatrix.png",filename="actionmatrix.png"))
 
  #  _______          _                 _____                           _                 
  # |__   __|        | |       ___     / ____|                         | |                
@@ -183,6 +287,8 @@ def getconfig(sub="PrequelMemes"):
     cfg = json.loads(cfg_str)
     return cfg
         
+
+
 
  #  _______        _       
  # |__   __|      | |      

@@ -1,2 +1,2 @@
-py SheevBot.py
+python3 SheevBot.py
 pause
