@@ -5,7 +5,7 @@ This is a bot originally made for /r/PrequelMemes to help with spam prevention.
 # Getting started
 
 
-## Installing packages and ignoring config files
+## Installing packages and renaming files
 1. Install the packages in `requirements.txt`.
 2. Tell git to ignore the following files, instructions [here](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files): `SheevCloud.py`, `bot_config.json`, `sheevsecrets.py`.
 
