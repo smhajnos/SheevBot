@@ -1,0 +1,63 @@
+{
+
+    "oc_text": "I noticed you flaired this as OC. Please reply to this comment to confirm that YOU made this or got permission to post it as OC.",
+
+    "oc_shame": "Your post has been removed because you failed to confirm that you made it in time.",
+
+    "oc_thanks": "Thanks for confirming that you flaired this correctly!",
+
+    
+    "repost_text": "I noticed you flaired this as a repost. Please provide a source by responding to this comment WITH A LINK or your post will be removed.",
+
+    "repost_shame": "Your post has been removed because you failed to supply a link to the source for the repost in time.",
+
+    "repost_thanks": "Thanks for providing a source!",
+
+    
+
+    "crosspost_repost_text": "I noticed you flaired this as a repost and provided a source by using the crosspost feature. Please reply to this comment to confirm you are not a bot or your post will be removed.",
+
+    "crosspost_repost_shame": "Your post has been removed because you failed to confirm you were not a bot in time.",
+
+    "crosspost_repost_thanks": "Thanks for confirming you aren't a bot!",
+
+    
+
+    "crosspost_repost_misflaired_text": "I noticed you flaired this as a repost, but you are the OP of the original post. If this is the first time posting this in this subreddit, you should change the flair to the OC flair (also, reply to this comment to confirm you are not a bot). If this is not the first time you are posting this in this subreddit, please reply to this comment to confirm you used the right flair and are not a bot, or your post will be removed.",
+
+    "crosspost_repost_misflaired_shame": "Your post has been removed because you failed to confirm you were not a bot in time.",
+
+    "crosspost_repost_misflaired_thanks": "Thanks for confirming you aren't a bot!",
+
+    
+    "crosspost_oc_text": "I noticed you flaired this as OC and you are the OP of the crossposted post. Please reply to this comment to confirm you are not a bot.",
+
+    "crosspost_oc_shame": "Your post has been removed because you failed to confirm you are not a bot in time.",
+
+    "crosspost_oc_thanks": "Thanks for confirming you aren't a bot!",
+    
+
+    "crosspost_oc_misflaired_text": "I noticed you flaired this as OC, but you are not the OP of the original post. Please change the flair to the repost flair and reply to this comment to confirm you are not a bot, or your post will be removed.",
+
+    "crosspost_oc_misflaired_shame": "Your post has been removed because you flaired it OC but are not the OP of the original post.",
+
+    "crosspost_oc_misflaired_thanks": "This message should never appear. Tagging /u/stevethecow to investigate.",
+
+
+
+    "approved_user_thanks": "You are an approved user, so I am not going to worry about this post. Thanks for consistently contributing to this community!",
+
+
+    "time_to_reply": 300,
+
+    "repost_cooldown":0,
+
+    "ignore_after": 600,
+
+
+
+    "repost_flairs":["General Reposti"],
+
+    "oc_flairs":["General KenOC"]
+
+}

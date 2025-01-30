@@ -1,0 +1,62 @@
+{
+
+"oc_text": "str",
+
+"oc_shame": "str",
+
+"oc_thanks": "str",
+
+
+"repost_text": "str",
+
+"repost_shame": "str",
+
+"repost_thanks": "str",
+
+
+
+"crosspost_repost_text": "str",
+
+"crosspost_repost_shame": "str",
+
+"crosspost_repost_thanks": "str",
+
+
+
+"crosspost_repost_misflaired_text": "str",
+
+"crosspost_repost_misflaired_shame": "str",
+
+"crosspost_repost_misflaired_thanks": "str",
+
+
+"crosspost_oc_text": "str",
+
+"crosspost_oc_shame": "str",
+
+"crosspost_oc_thanks": "str",
+
+
+"crosspost_oc_misflaired_text": "str",
+
+"crosspost_oc_misflaired_shame": "str",
+
+"crosspost_oc_misflaired_thanks": "str",
+
+
+
+"approved_user_thanks": "str",
+
+
+"time_to_reply": "int",
+
+"repost_cooldown":"int",
+
+"ignore_after": "int",
+
+"repost_flairs": "list:str",
+
+"oc_flairs": "list:str"
+
+
+}

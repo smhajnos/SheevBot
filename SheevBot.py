@@ -30,16 +30,29 @@ asyncio.set_event_loop(loop)
 asyncio.new_event_loop()
 
 
-mod_server = 429365222461931522
-servers = [mod_server]
+#  _       _ 
+# (_)     (_)
+#  _ _ __  _ 
+# | | '_ \| |
+# | | | | | |
+# |_|_| |_|_|
 
-channels = {
-    "log":1098770267372789832,
-    "modposts":895323724260188191,
-    "scoreboard":522946568089894932
-    }
 
-sheev_color = 0xfc036f
+with open("bot_config.json","r") as f:
+    bot_config = json.load(f)
+
+
+mod_server = bot_config["server"] # Discord server ID
+channels = bot_config["channels"] # Discord channel IDs
+username = bot_config["username"] # Reddit username
+user_agent = bot_config["user_agent"] # tbh not really sure what this is
+subreddit_names = bot_config["subreddits"] # list of subreddits to monitor
+admin_user = bot_config["admin_discord"] # Discord user ID of who to notify of critical errors
+test_sub_name = bot_config["test_subreddit"]
+sticky_check_frequency = bot_config["sticky_check_frequency"]
+main_check_frequency = bot_config["main_check_frequency"]
+
+
 
 intents = nextcord.Intents.all()
 #intents.members = True
@@ -53,7 +66,8 @@ cursor = None
 
 bot = commands.Bot(command_prefix='$', intents=intents)
 
-
+     
+            
 
 
 #  _                 _       
@@ -71,12 +85,12 @@ reddit = praw.Reddit(client_id=sheevsecrets.REDDIT_CLIENT_ID,
                      password=sheevsecrets.REDDIT_PASSWORD,
                      user_agent='SheevBot, the /r/PrequelMemes mod bot',
                      username=username)  
-subreddit_names = ["PrequelMemes", "PrequelMemesTest","SequelMemes"]
+#subreddit_names = ["PrequelMemes", "PrequelMemesTest","SequelMemes"]
 #subreddit_names = ["PrequelMemesTest"]
 subreddits = []
 for s in subreddit_names:
     subreddits.append(reddit.subreddit(s))
-test_subreddit = reddit.subreddit("PrequelMemesTest")
+test_subreddit = reddit.subreddit(test_sub_name)
 
 
  #   _____ _               _        
@@ -228,8 +242,12 @@ async def validateconfig(sub="PrequelMemes"):
     cfg_str = reddit.subreddit(sub).wiki["sheevbot"].content_md
     cfg = json.loads(cfg_str)
     
-    params_str = reddit.subreddit("PrequelMemes").wiki["sheevbotparams"].content_md
-    params = json.loads(params_str)
+    
+    #params_str = reddit.subreddit("PrequelMemes").wiki["sheevbotparams"].content_md
+    #params = json.loads(params_str)
+    with open("sheevbotparams.json", "r") as f:
+        params= json.load(f)
+        
     
     retval = True
     
@@ -281,7 +299,7 @@ async def validateconfig(sub="PrequelMemes"):
     return retval
     
     
-def getconfig(sub="PrequelMemes"):
+def getconfig(sub):
     print("getting config from {}".format(sub))
     cfg_str = reddit.subreddit(sub).wiki["sheevbot"].content_md
     cfg = json.loads(cfg_str)
@@ -309,7 +327,7 @@ def getconfig(sub="PrequelMemes"):
  #  ____) | (__| | | |  __/ (_| | |_| | |  __/ (_| |    | | (_| \__ \   <\__ \
  # |_____/ \___|_| |_|\___|\__,_|\__,_|_|\___|\__,_|    |_|\__,_|___/_|\_\___/
                                                                             
-@tasks.loop(seconds=3600)
+@tasks.loop(seconds=sticky_check_frequency)
 async def redditcheck():                                                                            
     for subreddit in subreddits:
         for i in [1,2]:
@@ -322,7 +340,7 @@ async def redditcheck():
                 print("Found sticky #{} in {}".format(i,subreddit.display_name))
                 cursor.execute("SELECT COUNT(*) FROM modposts WHERE post = ?",(submission.id,))
                 res = cursor.fetchone()
-                if res[0] == 0 and submission.title != "Free Talk Friday":
+                if res[0] == 0:
                     ch = bot.get_channel(channels["modposts"])
                     await ch.send("New Modpost by /u/{}:\r\n\r\nhttps://www.reddit.com{}".format(submission.author.name, submission.permalink))
                     cursor.execute("INSERT INTO modposts (post) VALUES (?)",(submission.id,))
@@ -332,7 +350,7 @@ async def redditcheck():
                 print("No sticky #{} found in {}".format(i,subreddit.display_name))
                                                                               
                                                                                        
-@tasks.loop(seconds=180)
+@tasks.loop(seconds=main_check_frequency)
 async def postchecktask():
     await post_checker()                                                                                       
                                                                                        
@@ -351,7 +369,7 @@ async def log(s, emergent=False):
     lc = bot.get_channel(channels["log"])
     print(s)
     if emergent:    
-        await lc.send("<@145372956304867328> {}".format(s))
+        await lc.send("<@{}> {}".format(admin_user, s))
     else:
         await lc.send(s)
 
