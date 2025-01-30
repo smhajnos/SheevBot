@@ -10,6 +10,6 @@
 "subreddits":["PrequelMemes", "PrequelMemesTest","SequelMemes"],
 "test_subreddit":"PrequelMemesTest",
 "admin_discord":145372956304867328,
-"stickey_check_frequency":3600,
+"sticky_check_frequency":3600,
 "main_check_frequency":180
 }
