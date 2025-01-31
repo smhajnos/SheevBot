@@ -150,7 +150,7 @@ async def report(ctx):
     subs = ["PrequelMemes", "SequelMemes"]
     for tsub in subs:
         sub = reddit.subreddit(tsub)        
-        modlog = sub.mod.log(limit=5000)
+        modlog = sub.mod.log(limit=50000)
  
         
         for log in modlog: # results are returned most recent first
