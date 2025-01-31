@@ -27,9 +27,8 @@ The bot is managed via discord. Your discord server needs a few things:
 3. A channel to dump the scoreboard report the bot can generate. This is a report meant to be run (manually) once a month that shows critical mod actions taken by your team during the previous month.
 
 ## Configuring the bot
-1. The `SheevCloud.py` file will have to be changed to suit your specific storage platform. If you are hosting the bot locally, just replace the entire contents of each function with `pass`.
-2. In `bot_config.json`, EVERYTHING needs to be changed except for the two "freqency" variables.
-3. For each subreddit you are monitoring (including the test subreddit), create a wiki page called `sheevbot`. Make sure it is hidden/mod-only/unlisted. Take the contents of `sheevbot.wiki`, paste them into the wiki page, then change the values to match your subreddits flairs, desired responses, etc.
+1. In `bot_config.json`, EVERYTHING needs to be changed except for the two "freqency" variables.
+2. For each subreddit you are monitoring (including the test subreddit), create a wiki page called `sheevbot`. Make sure it is hidden/mod-only/unlisted. Take the contents of `sheevbot.wiki`, paste them into the wiki page, then change the values to match your subreddits flairs, desired responses, etc.
 
 # Notes 
 
