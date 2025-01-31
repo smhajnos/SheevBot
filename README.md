@@ -7,7 +7,10 @@ This is a bot originally made for /r/PrequelMemes to help with spam prevention.
 
 ## Installing packages and renaming files
 1. Install the packages in `requirements.txt` by running `pip install -r requirements.txt`
-2. COPY the three files that end in `_EXAMPLE` to remove the `_EXAMPLE` from the filename. Leave the original `_EXAMPLE` files as well or git will get upset.
+2. Create a copy of `bot_config_EXAMPLE.json` as `bot_config.json`. Similarly, create a copy of `sheevsecrets_EXAMPLE.py` as `sheevsecrets.py`. 
+3. If you are hosting the bot locally, create a copy of `sheevcloud_LOCALHOST.py` as `sheevcloud.py`.
+4. If you are hosting the bot on google cloud, create a copy of `sheevcloud_EXAMPLE.py` as `sheevcloud.py`. Pip install package `google-cloud-storage`. Configure google cloud storage according to their documentation.
+5. If you are hosting the bot on some other service, you need to create a `sheevcloud.py` file that performs the functions in `sheevcloud_EXAMPLE.py` but for your hosting service. Good luck.
 
 ## Test Subreddit
 1. Create a test subreddit to test settings and stuff before you go live. Make it the ONLY subreddit in the "subreddits" list in the `bot_config.json` until you are ready to go live. Also, put it in the "test_subreddit" field.
@@ -15,7 +18,7 @@ This is a bot originally made for /r/PrequelMemes to help with spam prevention.
 ## Creating user accounts
 1. Create a discord bot. [Instructions here](https://discordpy.readthedocs.io/en/stable/discord.html). Put the token in `sheevsecrets.py`. The only perms you need are view channels, send messages, embed links, and attach files.
 2. You need a reddit account for the bot. Create the account regularly, log in, go to [this page](https://www.reddit.com/prefs/apps/) and create an app with type "script". Put the the secret and client ID in `sheevsecrets.py`. Also, put your password for the account in `sheevsecrets.py`.
-3. Invite the reddit account for the bot to your subreddits as a moderator. The perms it needs are users, flair, posts, comments, and wiki. 
+3. Invite the reddit account for the bot to your subreddits (including the test subreddit) as a moderator. The perms it needs are users, flair, posts, comments, and wiki. 
 
 ## Discord server
 The bot is managed via discord. Your discord server needs a few things:
@@ -30,6 +33,7 @@ The bot is managed via discord. Your discord server needs a few things:
 
 # Notes 
 
+* The bot is set up in such a way for multiple subreddits to be able to be managed by one bot and one mod team. This is because /r/PrequelMemes and /r/SequelMemes are managed by the same people. It will work just fine on one subreddit just keep in mind as you look through the settings, that's why everywhere there is a subreddit it is a list of subreddits.
 * The `SheevCloud.py` file is currently set up for my google cloud storage setup. I didn't make that file more generic/configurable because settup up google cloud was not easy, and I wanted to at least throw some kind of error if you didn't do your due diligence. The edits you have to make to the file if you are using google cloud storage are minimal.
 * The things in the `bot_config.json`, being on the machine the bot runs, are only meant to be set up by the admin running the bot.
 * The things on the `sheevbot` wiki pages, being on the subreddit itself, are meant to be manageable by any moderator in your subreddit.
