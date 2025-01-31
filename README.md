@@ -6,7 +6,7 @@ This is a bot originally made for /r/PrequelMemes to help with spam prevention.
 
 
 ## Installing packages and renaming files
-1. Install the packages in `requirements.txt`.
+1. Install the packages in `requirements.txt` by running `pip install -r requirements.txt`
 2. COPY the three files that end in `_EXAMPLE` to remove the `_EXAMPLE` from the filename. Leave the original `_EXAMPLE` files as well or git will get upset.
 
 ## Test Subreddit
@@ -30,7 +30,7 @@ The bot is managed via discord. Your discord server needs a few things:
 
 # Notes 
 
-* The `SheevCloud.json` file is currently set up for my google cloud storage setup. I didn't make that file more generic/configurable because settup up google cloud was not easy, and I wanted to at least throw some kind of error if you didn't do your due diligence. The edits you have to make to the file if you are using google cloud storage are minimal.
+* The `SheevCloud.py` file is currently set up for my google cloud storage setup. I didn't make that file more generic/configurable because settup up google cloud was not easy, and I wanted to at least throw some kind of error if you didn't do your due diligence. The edits you have to make to the file if you are using google cloud storage are minimal.
 * The things in the `bot_config.json`, being on the machine the bot runs, are only meant to be set up by the admin running the bot.
 * The things on the `sheevbot` wiki pages, being on the subreddit itself, are meant to be manageable by any moderator in your subreddit.
 * The PRAW module will be CONSTANTLY printing out a warning message about using it in an async environment. There is a bug in PRAW that prevents it from working with this for some reason, and I haven't been able to figure out a workaround, nor can I figure out how to supress the message.
