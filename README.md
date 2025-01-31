@@ -7,7 +7,7 @@ This is a bot originally made for /r/PrequelMemes to help with spam prevention.
 
 ## Installing packages and renaming files
 1. Install the packages in `requirements.txt`.
-2. Rename the three files that end in `_EXAMPLE` to remove the `_EXAMPLE` from he filename.
+2. COPY the three files that end in `_EXAMPLE` to remove the `_EXAMPLE` from he filename. Leave the original `_EXAMPLE` files as well or git will get upset.
 
 ## Creating user accounts
 1. Rename the file `sheevsecrets_EXAMPLE.py` to `sheevsecrets.py`.
