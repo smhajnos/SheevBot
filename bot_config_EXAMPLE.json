@@ -1,0 +1,15 @@
+{
+"server":429365222461931522,
+"channels": {
+    "log":1098770267372789832,
+    "modposts":895323724260188191,
+    "scoreboard":522946568089894932
+    },
+"username":"SheevBot",
+"user_agent":"SheevBot, the /r/PrequelMemes mod bot",
+"subreddits":["PrequelMemes", "PrequelMemesTest","SequelMemes"],
+"test_subreddit":"PrequelMemesTest",
+"admin_discord":145372956304867328,
+"sticky_check_frequency":3600,
+"main_check_frequency":180
+}
