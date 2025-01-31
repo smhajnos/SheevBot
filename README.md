@@ -7,7 +7,7 @@ This is a bot originally made for /r/PrequelMemes to help with spam prevention.
 
 ## Installing packages and renaming files
 1. Install the packages in `requirements.txt` by running `pip install -r requirements.txt`
-2. Create a copy of `bot_config_EXAMPLE.json` as `bot_config.json`. Similarly, create a copy of `sheevsecrets_EXAMPLE.py` as `sheevsecrets.py`. 
+2. Create a copy of `bot_config_EXAMPLE.json` as `bot_config.json`. Similarly, create a copy of `sheevsecrets_EXAMPLE.py` as `sheevsecrets.py`. Keep the original files that end in `_EXAMPLE` or you will have trouble pulling future updates with git.
 3. If you are hosting the bot locally, create a copy of `sheevcloud_LOCALHOST.py` as `sheevcloud.py`.
 4. If you are hosting the bot on google cloud, create a copy of `sheevcloud_EXAMPLE.py` as `sheevcloud.py`. Pip install package `google-cloud-storage`. Configure google cloud storage according to their documentation.
 5. If you are hosting the bot on some other service, you need to create a `sheevcloud.py` file that performs the functions in `sheevcloud_EXAMPLE.py` but for your hosting service. Good luck.
