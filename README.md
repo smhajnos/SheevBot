@@ -9,6 +9,9 @@ This is a bot originally made for /r/PrequelMemes to help with spam prevention.
 1. Install the packages in `requirements.txt`.
 2. COPY the three files that end in `_EXAMPLE` to remove the `_EXAMPLE` from the filename. Leave the original `_EXAMPLE` files as well or git will get upset.
 
+## Test Subreddit
+1. Create a test subreddit to test settings and stuff before you go live. Make it the ONLY subreddit in the "subreddits" list in the `bot_config.json` until you are ready to go live. Also, put it in the "test_subreddit" field.
+
 ## Creating user accounts
 1. Create a discord bot. [Instructions here](https://discordpy.readthedocs.io/en/stable/discord.html). Put the token in `sheevsecrets.py`. The only perms you need are view channels, send messages, embed links, and attach files.
 2. You need a reddit account for the bot. Create the account regularly, log in, go to [this page](https://www.reddit.com/prefs/apps/) and create an app with type "script". Put the the secret and client ID in `sheevsecrets.py`. Also, put your password for the account in `sheevsecrets.py`.
@@ -19,9 +22,6 @@ The bot is managed via discord. Your discord server needs a few things:
 1. A channel for the bot to dump its logs in. Note it will frequently report having truoble processing certain posts. I am looking into it but it doesn't seem to actually cause an issue. Mute the channel and only look in there if you are trying to diagnose something. The bot will ping you if something critical happens.
 2. A channel to log announcements in your subreddit. Every time you sticky a post the bot will post a link to the post in that channel. Note that by default this can take up to an hour to reduce unnecessary calls, since logging announcements is typically not time sensitive.
 3. A channel to dump the scoreboard report the bot can generate. This is a report meant to be run (manually) once a month that shows critical mod actions taken by your team during the previous month.
-
-## Test Subreddit
-1. Create a test subreddit to test settings and stuff before you go live. Make it the ONLY subreddit in the "subreddits" list in the `bot_config.json` until you are ready to go live. Also, put it in the "test_subreddit" field.
 
 ## Configuring the bot
 1. The `SheevCloud.py` file will have to be changed to suit your specific storage platform. If you are hosting the bot locally, just replace the entire contents of each function with `pass`.
