@@ -10,10 +10,9 @@ This is a bot originally made for /r/PrequelMemes to help with spam prevention.
 2. COPY the three files that end in `_EXAMPLE` to remove the `_EXAMPLE` from the filename. Leave the original `_EXAMPLE` files as well or git will get upset.
 
 ## Creating user accounts
-1. Rename the file `sheevsecrets_EXAMPLE.py` to `sheevsecrets.py`.
-2. Create a discord bot. [Instructions here](https://discordpy.readthedocs.io/en/stable/discord.html). Put the token in `sheevsecrets.py`. The only perms you need are view channels, send messages, embed links, and attach files.
-3. You need a reddit account for the bot. Create the account regularly, log in, go to [this page](https://www.reddit.com/prefs/apps/) and create an app with type "script". Put the the secret and client ID in `sheevsecrets.py`. Also, put your password for the account in `sheevsecrets.py`.
-4. Invite the reddit account for the bot to your subreddit as a moderator. The perms it needs are users, flair, posts, comments, and wiki. 
+1. Create a discord bot. [Instructions here](https://discordpy.readthedocs.io/en/stable/discord.html). Put the token in `sheevsecrets.py`. The only perms you need are view channels, send messages, embed links, and attach files.
+2. You need a reddit account for the bot. Create the account regularly, log in, go to [this page](https://www.reddit.com/prefs/apps/) and create an app with type "script". Put the the secret and client ID in `sheevsecrets.py`. Also, put your password for the account in `sheevsecrets.py`.
+3. Invite the reddit account for the bot to your subreddit as a moderator. The perms it needs are users, flair, posts, comments, and wiki. 
 
 ## Discord server
 The bot is managed via discord. Your discord server needs a few things:
