@@ -428,7 +428,7 @@ async def post_checker():
                         if submission.approved_by: #approved (by a human, this bot will never approve posts only remove them)
                             already_modded = True
                         for comment in submission.comments:
-                            if comment.stickied and not comment.author.name == "SheevBot":
+                            if comment.stickied and not comment.author.name == username:
                                 already_modded = True # modded by someone else, let the humans handle it
                                 
                         if not already_modded:
