@@ -78,7 +78,6 @@ bot = commands.Bot(command_prefix='$', intents=intents)
 # |______\___/ \__, |_|_| |_|
 #               __/ |        
 #              |___/         
-username = "SheevBot"
 
 reddit = praw.Reddit(client_id=sheevsecrets.REDDIT_CLIENT_ID,
                      client_secret=sheevsecrets.REDDIT_SECRET,
